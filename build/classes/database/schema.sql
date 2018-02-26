@@ -1,0 +1,28 @@
+DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS weapons;
+DROP TABLE IF EXISTS clients;
+
+CREATE TABLE weapons (
+  id    INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  brand VARCHAR(32) NOT NULL,
+  type VARCHAR(64) NOT NULL
+);
+
+CREATE TABLE clients (
+  id      INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  pesel   BIGINT(11) NOT NULL,
+  name    VARCHAR(64) NOT NULL,
+  surname VARCHAR(64) NOT NULL
+
+);
+
+CREATE TABLE orders (
+  id         INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  clientId   INT NOT NULL,
+  weaponId     INT NOT NULL,
+  price      INT NOT NULL,
+  loanPeriod INT NOT NULL,
+
+  FOREIGN KEY (weaponId) REFERENCES weapons (id),
+  FOREIGN KEY (clientId) REFERENCES clients (id)
+);

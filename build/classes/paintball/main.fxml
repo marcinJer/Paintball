@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.paint.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="589.0" prefWidth="803.0" style="-fx-background-color: #000000;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="paintball.MainController">
+   <children>
+      <TabPane prefHeight="537.0" prefWidth="722.0" rotateGraphic="true" side="LEFT" tabClosingPolicy="UNAVAILABLE" tabMinHeight="118.0" tabMinWidth="118.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <tabs>
+          <Tab style="-fx-rotate: 90; -fx-background-color: #3C392F; -fx-color: #120C0C;" text="Strona główna">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" style="-fx-background-image: ;">
+                     <children>
+                        <ImageView fitHeight="589.0" fitWidth="701.0" layoutX="-1.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <image>
+                              <Image url="@main_back.png" />
+                           </image>
+                        </ImageView>
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+          <Tab style="-fx-rotate: 90; -fx-background-color: #3C392F; -fx-color: #FF00FF;" text="Zarządzanie klientami">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" style="-fx-background-color: #000000;">
+                     <children>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="517.0" prefWidth="722.0" style="-fx-background-color: #000000;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <children>
+                              <ImageView fitHeight="577.0" fitWidth="746.0" layoutX="-38.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="48.99554443359375" AnchorPane.leftAnchor="-38.0" AnchorPane.rightAnchor="-25.0" AnchorPane.topAnchor="14.0">
+                                 <image>
+                                    <Image url="@tapeta2.jpg" />
+                                 </image>
+                              </ImageView>
+                              <TableView fx:id="clientsTable" layoutX="31.0" layoutY="277.0" onMouseClicked="#handleClient" prefHeight="200.0" prefWidth="398.0" style="-fx-border-color: #000000; -fx-border-width: 3;">
+                                 <columns>
+                                    <TableColumn fx:id="columnClientId" prefWidth="64.0" text="ID Klienta" />
+                                    <TableColumn fx:id="columnClientsName" prefWidth="82.0" text="Imię" />
+                                    <TableColumn fx:id="columnClientsSurname" prefWidth="115.0" text="Nazwisko" />
+                                    <TableColumn fx:id="columnClientPesel" prefWidth="136.0" text="PESEL" />
+                                 </columns>
+                              </TableView>
+                              <Button layoutX="39.0" layoutY="235.0" mnemonicParsing="false" onAction="#addClient" style="-fx-border-color: #000000; -fx-border-width: 2;" text="Dodaj" textAlignment="CENTER" />
+                              <Button layoutX="105.0" layoutY="235.0" mnemonicParsing="false" onAction="#editClient" style="-fx-border-color: #000000; -fx-border-width: 2;" text="Edytuj" />
+                              <Button layoutX="172.0" layoutY="235.0" mnemonicParsing="false" onAction="#deleteClient" style="-fx-border-color: #000000; -fx-border-width: 2;" text="Usuń" />
+                              <Text fill="RED" layoutX="31.0" layoutY="142.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Imię:">
+                                 <font>
+                                    <Font name="System Bold" size="14.0" />
+                                 </font></Text>
+                              <Text fill="RED" layoutX="14.0" layoutY="173.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Nazwisko:">
+                                 <font>
+                                    <Font name="System Bold" size="14.0" />
+                                 </font></Text>
+                              <Text fill="RED" layoutX="27.0" layoutY="212.0" strokeType="OUTSIDE" strokeWidth="0.0" text="PESEL:">
+                                 <font>
+                                    <Font name="System Bold" size="14.0" />
+                                 </font></Text>
+                              <TextField fx:id="textClientName" layoutX="87.0" layoutY="122.0" style="-fx-border-color: #000000; -fx-border-width: 2;" />
+                              <TextField fx:id="textClientSurname" layoutX="87.0" layoutY="155.0" style="-fx-border-color: #000000; -fx-border-width: 2;" />
+                              <TextField fx:id="textClientId" layoutX="87.0" layoutY="192.0" style="-fx-border-color: #000000; -fx-border-width: 2;" />
+                              <Label fx:id="labelInfoClient" layoutX="253.0" layoutY="118.0" prefHeight="26.0" prefWidth="301.0" textFill="#0004ff" AnchorPane.bottomAnchor="373.0" AnchorPane.leftAnchor="253.0" AnchorPane.rightAnchor="168.0" AnchorPane.topAnchor="118.0">
+                                 <font>
+                                    <Font size="13.0" />
+                                 </font></Label>
+                              <Button layoutX="264.0" layoutY="221.0" mnemonicParsing="false" onAction="#editionInstruction" prefHeight="29.0" prefWidth="125.0" style="-fx-border-color: #000000; -fx-border-width: 2;" text="Instrukcja edycji" />
+                              <Button layoutX="264.0" layoutY="248.0" mnemonicParsing="false" onAction="#deleteInstruction" prefHeight="29.0" prefWidth="125.0" style="-fx-border-color: #000000; -fx-border-width: 2;" text="Instrukcja usuwania" />
+                           </children>
+                        </AnchorPane>
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+            <Tab style="-fx-rotate: 90; -fx-background-color: #3C392F; -fx-color: #f80000;" text="Baza wyposażenia">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="521.0" prefWidth="722.0" style="-fx-background-color: #D3D3D3;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <children>
+                              <ImageView fitHeight="603.0" fitWidth="755.0" layoutX="-1.0" layoutY="-2.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <image>
+                                    <Image url="@moro.jpg" />
+                                 </image>
+                              </ImageView>
+                              <Text fill="RED" layoutX="99.0" layoutY="103.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Marka:" wrappingWidth="69.724609375">
+                                 <font>
+                                    <Font name="System Bold" size="19.0" />
+                                 </font></Text>
+                              <Text fill="RED" layoutX="99.0" layoutY="165.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Model:">
+                                 <font>
+                                    <Font name="System Bold" size="19.0" />
+                                 </font></Text>
+                              <Button layoutX="99.0" layoutY="215.0" mnemonicParsing="false" onAction="#addWeapon" text="Dodaj" />
+                              <TableView fx:id="WeaponsTable" layoutX="93.0" layoutY="279.0" onMouseClicked="#handleWeapon" prefHeight="231.0" prefWidth="497.0">
+                                 <columns>
+                                    <TableColumn fx:id="columnWeaponId" prefWidth="136.0" text="ID Gokartu" />
+                                    <TableColumn fx:id="columnWeaponBrand" prefWidth="193.0" text="Marka" />
+                                    <TableColumn fx:id="columnWeaponModel" prefWidth="167.0" text="Model" />
+                                 </columns>
+                              </TableView>
+                              <Button layoutX="168.0" layoutY="215.0" mnemonicParsing="false" onAction="#editWeapon" text="Edytuj" />
+                              <Button layoutX="238.0" layoutY="215.0" mnemonicParsing="false" onAction="#deleteWeapon" text="Usuń" />
+                              <Label fx:id="labelInfoWeapon" alignment="TOP_LEFT" layoutX="349.0" layoutY="83.0" prefHeight="94.0" prefWidth="316.0" textFill="WHITE">
+                                 <font>
+                                    <Font size="15.0" />
+                                 </font></Label>
+                              <ComboBox fx:id="comboBoxModel" layoutX="185.0" layoutY="145.0" prefWidth="150.0" />
+                              <ComboBox fx:id="comboBoxBrand" layoutX="185.0" layoutY="83.0" prefWidth="150.0" />
+                              <Text fill="RED" layoutX="264.0" layoutY="41.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Wyposażenie">
+                                 <font>
+                                    <Font name="System Bold" size="25.0" />
+                                 </font>
+                              </Text>
+                              <Button layoutX="394.0" layoutY="226.0" mnemonicParsing="false" onAction="#deleteInstruction1" prefHeight="29.0" prefWidth="125.0" style="-fx-border-color: #000000; -fx-border-width: 2;" text="Instrukcja usuwania" />
+                              <Button layoutX="394.0" layoutY="186.0" mnemonicParsing="false" onAction="#editionInstruction1" prefHeight="29.0" prefWidth="125.0" style="-fx-border-color: #000000; -fx-border-width: 2;" text="Instrukcja edycji" />
+                           </children>
+                        </AnchorPane>
+                     </children>
+                  </AnchorPane>
+              </content>
+            </Tab>
+            <Tab style="-fx-rotate: 90; -fx-background-color: #3C392F; -fx-color: #f80000;" text="Zamówienia">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <AnchorPane fx:id="orderTab1" minHeight="0.0" minWidth="0.0" prefHeight="523.0" prefWidth="731.0" style="-fx-background-color: #D3D3D3;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <children>
+                              <ImageView fitHeight="609.0" fitWidth="772.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <image>
+                                    <Image url="@moro.jpg" />
+                                 </image>
+                              </ImageView>
+                              <Button layoutX="12.0" layoutY="260.0" mnemonicParsing="false" onAction="#addOrder" prefHeight="25.0" prefWidth="120.0" text="Dodaj zamówienie" />
+                              <Text fill="RED" layoutX="13.0" layoutY="114.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Marker:">
+                                 <font>
+                                    <Font name="System Bold" size="16.0" />
+                                 </font></Text>
+                              <ComboBox fx:id="comboBoxWeapon" layoutX="86.0" layoutY="97.0" prefWidth="150.0" />
+                              <Text fill="#fc0000" layoutX="303.0" layoutY="32.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Zamówienia:">
+                                 <font>
+                                    <Font name="System Bold Italic" size="20.0" />
+                                 </font></Text>
+                              <Text fill="RED" layoutX="16.0" layoutY="228.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Cena:">
+                                 <font>
+                                    <Font name="System Bold" size="16.0" />
+                                 </font></Text>
+                              <TextField fx:id="textFieldPrice" layoutX="61.0" layoutY="209.0" prefHeight="25.0" prefWidth="78.0" />
+                              <Text fill="RED" layoutX="13.0" layoutY="58.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Klient:">
+                                 <font>
+                                    <Font name="System Bold" size="16.0" />
+                                 </font></Text>
+                              <ComboBox fx:id="comboBoxClient" layoutX="86.0" layoutY="41.0" prefWidth="150.0" />
+                              <Label fx:id="labelInfoAdminOrders" layoutX="275.0" layoutY="41.0" prefHeight="178.0" prefWidth="395.0" textFill="WHITE">
+                                 <font>
+                                    <Font name="System Bold" size="15.0" />
+                                 </font></Label>
+                              <Button layoutX="12.0" layoutY="305.0" mnemonicParsing="false" onAction="#deleteOrder" prefHeight="25.0" prefWidth="120.0" text="Usuń zamówienie" />
+                              <TableView fx:id="ordersTable" layoutX="12.0" layoutY="360.0" prefHeight="182.0" prefWidth="637.0">
+                                 <columns>
+                                    <TableColumn fx:id="columnOrderClientName" prefWidth="70.0" text="Imię" />
+                                    <TableColumn fx:id="columnOrderClientSurname" prefWidth="100.0" text="Nazwisko" />
+                                    <TableColumn fx:id="columnOrderClientId" prefWidth="100.0" text="Pesel" />
+                                    <TableColumn fx:id="columnOrderBrand" prefWidth="104.0" text="Broń" />
+                                    <TableColumn fx:id="columnOrderType" prefWidth="118.0" text="Typ" />
+                                    <TableColumn fx:id="columnPrice" minWidth="0.0" prefWidth="71.0" text="Cena" />
+                                    <TableColumn fx:id="columnBullets" maxWidth="172.0" prefWidth="73.0" text="Ilość kulek" />
+                                 </columns>
+                              </TableView>
+                              <ComboBox fx:id="comboBoxBullets" layoutX="112.0" layoutY="150.0" onAction="#setOrderPrice" prefWidth="150.0" />
+                              <Text fill="RED" layoutX="14.0" layoutY="169.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Ilość kulek:" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="System Bold" size="16.0" />
+                                 </font>
+                              </Text>
+                           </children>
+                        </AnchorPane>
+                     </children>
+                  </AnchorPane>
+              </content>
+            </Tab>
+        </tabs>
+         <cursor>
+            <Cursor fx:constant="DEFAULT" />
+         </cursor>
+         <padding>
+            <Insets left="-5.0" />
+         </padding>
+      </TabPane>
+   </children>
+</AnchorPane>
