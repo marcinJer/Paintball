@@ -18,11 +18,11 @@ private MainController mainController;
     }
     @Override
   public void start(Stage primaryStage) throws Exception {
-    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("main.fxml"));
+    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/main.fxml"));
     Parent root = fxmlLoader.load();
     this.mainController = fxmlLoader.getController();
     Scene scene = new Scene(root);
-    String css = Paintball.class.getResource("style.css").toExternalForm();
+    String css = Paintball.class.getResource("/style.css").toExternalForm();
     scene.getStylesheets().add(css);
     primaryStage.setScene(scene);
     primaryStage.setResizable(false);
