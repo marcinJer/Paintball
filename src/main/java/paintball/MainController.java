@@ -3,10 +3,10 @@ package paintball;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+
 import javafx.animation.PauseTransition;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -16,12 +16,10 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
-import javafx.util.Callback;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
 import org.hibernate.Session;
@@ -48,7 +46,7 @@ public class MainController implements Initializable {
     private TableColumn<Weapon, String> columnWeaponModel;
     @FXML
     private ComboBox<String> comboBoxModel;
-    
+
     //Clients
     @FXML
     private TextField textClientName;
@@ -66,6 +64,7 @@ public class MainController implements Initializable {
     private TableColumn<Client, Long> columnClientPesel;
     @FXML
     private TableColumn<Client, Integer> columnClientId;
+
     private ObservableList<Client> ObservableListClients;
     private ObservableList<Weapon> ObservableListWeapons;
     private ObservableList<Order> ObservableListOrders;
@@ -78,7 +77,7 @@ public class MainController implements Initializable {
     @FXML
     private ComboBox<Integer> comboBoxBullets;
     @FXML
-    private TableView<Order> ordersTable; 
+    private TableView<Order> ordersTable;
     @FXML
     private TextField textFieldPrice;
     @FXML
@@ -109,18 +108,18 @@ public class MainController implements Initializable {
         loadWeaponDataFromDatabase(null);
         loadClientDataFromDatabase(null);
         loadDataFromWeaponDatabaseIntoCombobox(null);
-        loadDataFromClietnDatabaseIntoCombobox(null);
+        loadDataFromClientDatabaseIntoCombobox(null);
         loadOrderDataFromDatabase(null);
-        
+
         comboBoxBrand.getItems().addAll("Brawler", "Spyder Kingman");
         comboBoxModel.getItems().addAll("Pompka", "Pneumatyczny", "Elektro-pneumatyczny", "Elektroniczny");
         comboBoxBullets.getItems().addAll(
-        100,
-        200,
-        300,
-        400,
-        500,
-        600);
+                100,
+                200,
+                300,
+                400,
+                500,
+                600);
     }
 
     private void initDatabase() {
@@ -143,91 +142,105 @@ public class MainController implements Initializable {
         this.sessionFactory.close();
     }
 
+    private void saveToDatabase(Object object) {
+        Transaction transaction = session.beginTransaction();
+        session.save(object);
+        transaction.commit();
+    }
+
+    private void deleteFromDatabase(Object object) {
+        Transaction transaction = session.beginTransaction();
+        session.delete(object);
+        transaction.commit();
+    }
+
+    private void updateObject(Object object) {
+        Transaction transaction = session.beginTransaction();
+        session.merge(object);
+        transaction.commit();
+    }
+
+    private void labelVisibility(Label label) {
+        PauseTransition visiblePause = new PauseTransition(
+                Duration.seconds(3)
+        );
+        visiblePause.setOnFinished(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                label.setVisible(false);
+            }
+        });
+        visiblePause.play();
+        label.setVisible(true);
+
+    }
+
+
+
     //Weapons
     @FXML
-    public void addWeapon(ActionEvent event) {
-        if((comboBoxModel.getSelectionModel().getSelectedItem() == null) || (comboBoxBrand.getSelectionModel().getSelectedItem() == null) ){
+    private void addWeapon(ActionEvent event) {
+        if ((comboBoxModel.getSelectionModel().getSelectedItem() == null) || (comboBoxBrand.getSelectionModel().getSelectedItem() == null)) {
             labelInfoWeapon.setText("Proszę wypełnić wszystkie pola");
             return;
         }
         Weapon weapon = new Weapon(null, comboBoxBrand.getSelectionModel().getSelectedItem(), comboBoxModel.getSelectionModel().getSelectedItem());
 
-        Transaction transaction = session.beginTransaction();
-        session.save(weapon);
-        transaction.commit();
+        saveToDatabase(weapon);
 
         comboBoxBrand.getSelectionModel().clearSelection();
         comboBoxModel.getSelectionModel().clearSelection();
 
-        
+
         labelInfoWeapon.setText("Dodano marker paintballowy");
-        PauseTransition visiblePause = new PauseTransition(
-                Duration.seconds(3)
-        );
-        visiblePause.setOnFinished(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                labelInfoWeapon.setVisible(false);
-            }
-        });
-        visiblePause.play();
-        labelInfoWeapon.setVisible(true);
-        
+        labelVisibility(labelInfoWeapon);
+
         refreshWeaponsTable();
         refreshWeaponComboBox();
     }
 
     @FXML
-    public void loadWeaponDataFromDatabase(ActionEvent event) {
+    private void loadWeaponDataFromDatabase(ActionEvent event) {
         Transaction transaction = session.beginTransaction();
-        List<Weapon> allWeapons = session.createCriteria(Weapon.class).list();
+        List allWeapons = session.createCriteria(Weapon.class).list();
         transaction.commit();
 
         columnWeaponId.setCellValueFactory(new PropertyValueFactory<>("id"));
         columnWeaponBrand.setCellValueFactory(new PropertyValueFactory<>("brand"));
         columnWeaponModel.setCellValueFactory(new PropertyValueFactory<>("type"));
-       
+
 
         WeaponsTable.setItems(null);
         WeaponsTable.setItems(ObservableListWeapons);
 
-        ObservableList<Weapon> weaponsList = FXCollections.observableArrayList(allWeapons);
+        ObservableList weaponsList = FXCollections.observableArrayList(allWeapons);
         WeaponsTable.setItems(weaponsList);
     }
 
     @FXML
-    public void deleteWeapon(ActionEvent event) {
+    private void deleteWeapon(ActionEvent event) {
 
         Weapon weapon = WeaponsTable.getSelectionModel().getSelectedItem();
-        Transaction transaction = session.beginTransaction();
-        session.delete(weapon);
-        transaction.commit();
+
+        deleteFromDatabase(weapon);
 
         comboBoxBrand.getSelectionModel().clearSelection();
         comboBoxModel.getSelectionModel().clearSelection();
         labelInfoWeapon.setText("Usunięto marker paintballowy!");
-        PauseTransition visiblePause = new PauseTransition(
-                Duration.seconds(3)
-        );
-        visiblePause.setOnFinished(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                labelInfoWeapon.setVisible(false);
-            }
-        });
-        visiblePause.play();
-        labelInfoWeapon.setVisible(true);
+
+        labelVisibility(labelInfoWeapon);
+
         refreshWeaponsTable();
         refreshWeaponComboBox();
-    
+
     }
-    
+
 
     @FXML
-    public void editWeapon(ActionEvent event) {
+    private void editWeapon(ActionEvent event) {
 
-        
-        if(((comboBoxModel.getSelectionModel().getSelectedItem() == null) || comboBoxModel.getSelectionModel().isEmpty()) || ((comboBoxBrand.getSelectionModel().getSelectedItem()== null) || comboBoxBrand.getSelectionModel().isEmpty()) ){
+
+        if (((comboBoxModel.getSelectionModel().getSelectedItem() == null) || comboBoxModel.getSelectionModel().isEmpty()) || ((comboBoxBrand.getSelectionModel().getSelectedItem() == null) || comboBoxBrand.getSelectionModel().isEmpty())) {
             labelInfoWeapon.setText("Proszę wypełnić wszystkie pola");
             return;
         }
@@ -236,48 +249,36 @@ public class MainController implements Initializable {
         Weapon weaponEdit = new Weapon(selectedId, comboBoxBrand.getSelectionModel().getSelectedItem(), comboBoxModel.getSelectionModel().getSelectedItem());
         weaponEdit.setId(selectedId);
 
-        Transaction transaction = session.beginTransaction();
-        session.merge(weaponEdit);
-        transaction.commit();
+        updateObject(weaponEdit);
 
         comboBoxBrand.getSelectionModel().clearSelection();
         comboBoxModel.getSelectionModel().clearSelection();
         labelInfoWeapon.setText("Dane markeru paintballowego \n "
                 + "zostały zmienione!");
-        PauseTransition visiblePause = new PauseTransition(
-                Duration.seconds(3)
-        );
-        visiblePause.setOnFinished(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                labelInfoWeapon.setVisible(false);
-            }
-        });
-        visiblePause.play();
-        labelInfoWeapon.setVisible(true);
+        labelVisibility(labelInfoWeapon);
         refreshWeaponsTable();
         refreshWeaponComboBox();
     }
 
     @FXML
-    public void refreshWeaponsTable() {
+    private void refreshWeaponsTable() {
 
         Transaction transaction = session.beginTransaction();
-        List<Weapon> allWeapons = session.createCriteria(Weapon.class).list();
+        List allWeapons = session.createCriteria(Weapon.class).list();
         transaction.commit();
 
-        ObservableList<Weapon> weaponsList = FXCollections.observableArrayList(allWeapons);
+        ObservableList weaponsList = FXCollections.observableArrayList(allWeapons);
         WeaponsTable.setItems(weaponsList);
         WeaponsTable.refresh();
     }
 
     @FXML
-    public void handleWeapon(MouseEvent event) {
+    private void handleWeapon(MouseEvent event) {
         Weapon selected = WeaponsTable.getSelectionModel().getSelectedItem();
 
         if (selected != null) {
 
-            
+
             refreshWeaponsTable();
         }
     }
@@ -285,135 +286,80 @@ public class MainController implements Initializable {
     // ==================================================================================================================================
     //CLIENTS
     // ==================================================================================================================================
-    
+
     @FXML
-    public void addClient(ActionEvent event) {
-        if(((textClientName.getText() == null) || textClientName.getText().isEmpty()) || ((textClientSurname.getText() == null) || textClientSurname.getText().isEmpty()) || ((textClientId.getText() == null)|| (textClientId.getText().isEmpty())) ){
+    private void addClient(ActionEvent event) {
+        if (((textClientName.getText() == null) || textClientName.getText().isEmpty()) || ((textClientSurname.getText() == null) || textClientSurname.getText().isEmpty()) || ((textClientId.getText() == null) || (textClientId.getText().isEmpty()))) {
             labelInfoClient.setText("Proszę wypełnić wszystkie pola");
+            labelVisibility(labelInfoClient);
             return;
         }
+
         String name = textClientName.getText();
         String surname = textClientSurname.getText();
-        
-        if (textClientId.getLength() >= 11) {
-            textClientId.setText(textClientId.getText().substring(0, 11));
-        } else {
+
+        if (textClientId.getLength() > 11) {
             labelInfoClient.setText("PESEL musi składać się z wyłącznie z 11 cyfr!");
-            PauseTransition visiblePause = new PauseTransition(
-                    Duration.seconds(3)
-            );
-            visiblePause.setOnFinished(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent event) {
-                    labelInfoClient.setVisible(false);
-                }
-            });
-            visiblePause.play();
-            labelInfoClient.setVisible(true);
-            return;
+            labelVisibility(labelInfoClient);
+
+        } else if (textClientId.getLength() < 11) {
+            labelInfoClient.setText("PESEL musi składać się z wyłącznie z 11 cyfr!");
+            labelVisibility(labelInfoClient);
+
+        } else {
+            long pesel = Long.parseLong(textClientId.getText());
+
+            Client client = new Client(null, pesel, name, surname);
+
+            saveToDatabase(client);
+
+            textClientName.clear();
+            textClientSurname.clear();
+            textClientId.clear();
+            labelInfoClient.setText("Dodano klienta!");
+
+            labelVisibility(labelInfoClient);
+            refreshClientTable();
+            refreshClientComboBox();
+
+
         }
-        long pesel = Long.parseLong(textClientId.getText());
-
-        Client client = new Client(null, pesel, name, surname);
-
-        Transaction transaction = session.beginTransaction();
-        session.save(client);
-        transaction.commit();
-
-        textClientName.clear();
-        textClientSurname.clear();
-        textClientId.clear();
-        labelInfoClient.setText("Dodano klienta!");
-        PauseTransition visiblePause = new PauseTransition(
-                Duration.seconds(3)
-        );
-        visiblePause.setOnFinished(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                labelInfoClient.setVisible(false);
-            }
-        });
-        visiblePause.play();
-        labelInfoClient.setVisible(true);
-        refreshClientTable();
-        refreshClientComboBox();
-
     }
-    
+
     @FXML
-    public void editionInstruction(ActionEvent event){
+    private void editionInstruction(ActionEvent event) {
         labelInfoClient.setText("1. Kliknij na wybranego klienta w tabeli \n"
                 + "2. Wprowadź nowe dane w polach tekstowych \n"
                 + "3. Kliknij 'edytuj'");
-        PauseTransition visiblePause = new PauseTransition(
-                Duration.seconds(8)
-        );
-        visiblePause.setOnFinished(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                labelInfoClient.setVisible(false);
-            }
-        });
-        visiblePause.play();
-        labelInfoClient.setVisible(true);
-    }
-    
-    @FXML
-    public void deleteInstruction(ActionEvent event){
-        labelInfoClient.setText("1. Kliknij na wybranego klienta w tabeli \n"
-                + "2. Kliknij usuń \n");
-        PauseTransition visiblePause = new PauseTransition(
-                Duration.seconds(8)
-        );
-        visiblePause.setOnFinished(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                labelInfoClient.setVisible(false);
-            }
-        });
-        visiblePause.play();
-        labelInfoClient.setVisible(true);
-    }
-    
-    @FXML
-    public void editionInstruction1(ActionEvent event){
-        labelInfoWeapon.setText("1. Kliknij na wybranego klienta w tabeli \n"
-                + "2. Wprowadź nowe dane w polach tekstowych \n"
-                + "3. Kliknij 'edytuj'");
-        PauseTransition visiblePause = new PauseTransition(
-                Duration.seconds(8)
-        );
-        visiblePause.setOnFinished(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                labelInfoWeapon.setVisible(false);
-            }
-        });
-        visiblePause.play();
-        labelInfoWeapon.setVisible(true);
-    }
-    
-    @FXML
-    public void deleteInstruction1(ActionEvent event){
-        labelInfoWeapon.setText("1. Kliknij na wybranego klienta w tabeli \n"
-                + "2. Kliknij usuń \n");
-        PauseTransition visiblePause = new PauseTransition(
-                Duration.seconds(8)
-        );
-        visiblePause.setOnFinished(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                labelInfoWeapon.setVisible(false);
-            }
-        });
-        visiblePause.play();
-        labelInfoWeapon.setVisible(true);
+        labelVisibility(labelInfoClient);
     }
 
     @FXML
-    public void loadClientDataFromDatabase(ActionEvent event) {
+    private void deleteInstruction(ActionEvent event) {
+        labelInfoClient.setText("1. Kliknij na wybranego klienta w tabeli \n"
+                + "2. Kliknij usuń \n");
+        labelVisibility(labelInfoClient);
+    }
+
+    @FXML
+    private void editionInstruction1(ActionEvent event) {
+        labelInfoWeapon.setText("1. Kliknij na wybranego markera w tabeli \n"
+                + "2. Wprowadź nowe dane w comboboxach \n"
+                + "3. Kliknij 'edytuj'");
+        labelVisibility(labelInfoWeapon);
+    }
+
+    @FXML
+    private void deleteInstruction1(ActionEvent event) {
+        labelInfoWeapon.setText("1. Kliknij na wybranego markera w tabeli \n"
+                + "2. Kliknij usuń \n");
+        labelVisibility(labelInfoWeapon);
+    }
+
+    @FXML
+    private void loadClientDataFromDatabase(ActionEvent event) {
         Transaction transaction = session.beginTransaction();
-        List<Client> allClients = session.createCriteria(Client.class).list();
+        List allClients = session.createCriteria(Client.class).list();
         transaction.commit();
 
         columnClientsName.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -424,117 +370,75 @@ public class MainController implements Initializable {
         clientsTable.setItems(null);
         clientsTable.setItems(ObservableListClients);
 
-        ObservableList<Client> clientsList = FXCollections.observableArrayList(allClients);
+        ObservableList clientsList = FXCollections.observableArrayList(allClients);
         clientsTable.setItems(clientsList);
     }
 
     @FXML
-    public void deleteClient(ActionEvent event) {
+    private void deleteClient(ActionEvent event) {
 
-        if(clientsTable.getSelectionModel().isEmpty()){
+        if (clientsTable.getSelectionModel().isEmpty()) {
             labelInfoClient.setText("Wybierz klienta!");
-            PauseTransition visiblePause = new PauseTransition(
-                Duration.seconds(3)
-        );
-        visiblePause.setOnFinished(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                labelInfoClient.setVisible(false);
-            }
-        });
-        visiblePause.play();
-        labelInfoClient.setVisible(true);
+            labelVisibility(labelInfoClient);
             return;
-            
         }
         Client client = clientsTable.getSelectionModel().getSelectedItem();
-        try{
-           
-        Transaction transaction = session.beginTransaction();
-        session.delete(client);
-        transaction.commit();
+        try {
 
-        textClientName.clear();
-        textClientSurname.clear();
-        textClientId.clear();
-        labelInfoClient.setText("Usunięto klienta!");
-        PauseTransition visiblePause = new PauseTransition(
-                Duration.seconds(3)
-        );
-        visiblePause.setOnFinished(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                labelInfoClient.setVisible(false);
-            }
-        });
-        visiblePause.play();
-        labelInfoClient.setVisible(true);
-        loadOrderDataFromDatabase(null);
-        refreshClientTable();
-        refreshClientComboBox();
-        }catch(RuntimeException e){
+            deleteFromDatabase(client);
+
+            textClientName.clear();
+            textClientSurname.clear();
+            textClientId.clear();
+            labelInfoClient.setText("Usunięto klienta!");
+            labelVisibility(labelInfoClient);
+            loadOrderDataFromDatabase(null);
+            refreshClientTable();
+            refreshClientComboBox();
+        } catch (RuntimeException e) {
             labelInfoClient.setText("Ten klient już złożył zamówienie. \n "
                     + "Nie można go usunąć!");
+            labelVisibility(labelInfoClient);
         }
     }
 
     @FXML
-    public void editClient(ActionEvent event) {
+    private void editClient(ActionEvent event) {
 
         String name = textClientName.getText();
         String surname = textClientSurname.getText();
-        if (textClientId.getLength() >= 11) {
-            textClientId.setText(textClientId.getText().substring(0, 11));
-        } else {
+        if (textClientId.getLength() > 11) {
             labelInfoClient.setText("PESEL musi składać się z wyłącznie z 11 cyfr!");
-            PauseTransition visiblePause = new PauseTransition(
-                    Duration.seconds(3)
-            );
-            visiblePause.setOnFinished(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent event) {
-                    labelInfoClient.setVisible(false);
-                }
-            });
-            visiblePause.play();
-            labelInfoClient.setVisible(true);
-            return;
+            labelVisibility(labelInfoClient);
 
+        } else if (textClientId.getLength() < 11) {
+            labelInfoClient.setText("PESEL musi składać się z wyłącznie z 11 cyfr!");
+            labelVisibility(labelInfoClient);
+
+        } else {
+            long pesel = Long.parseLong(textClientId.getText());
+
+            int selectedId = clientsTable.getSelectionModel().getSelectedItem().getId();
+            Client clientEdit = new Client(selectedId, pesel, name, surname);
+            clientEdit.setId(selectedId);
+
+            updateObject(clientEdit);
+
+            textClientName.clear();
+            textClientSurname.clear();
+            textClientId.clear();
+
+            labelInfoClient.setText("Dane klienta zostały zmienione");
+            labelVisibility(labelInfoClient);
+
+            refreshClientTable();
+            refreshClientComboBox();
+            refreshOrdersTable();
         }
-        long pesel = Long.parseLong(textClientId.getText());
-
-        int selectedId = clientsTable.getSelectionModel().getSelectedItem().getId();
-        Client clientEdit = new Client(selectedId, pesel, name, surname);
-        clientEdit.setId(selectedId);
-
-        Transaction transaction = session.beginTransaction();
-        session.merge(clientEdit);
-        transaction.commit();
-
-        textClientName.clear();
-        textClientSurname.clear();
-        textClientId.clear();
-        
-        labelInfoClient.setText("Dane klienta zostały zmienione");
-        PauseTransition visiblePause = new PauseTransition(
-                Duration.seconds(3)
-        );
-        visiblePause.setOnFinished(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                labelInfoClient.setVisible(false);
-            }
-        });
-        visiblePause.play();
-        labelInfoClient.setVisible(true);
-        
-        refreshClientTable();
-        refreshClientComboBox();
-        refreshOrdersTable();
     }
 
     @FXML
-    public void handleClient(MouseEvent event) {
+    private void handleClient(MouseEvent event) {
         Client selected = clientsTable.getSelectionModel().getSelectedItem();
 
         if (selected != null) {
@@ -549,13 +453,13 @@ public class MainController implements Initializable {
     }
 
     @FXML
-    public void refreshClientTable() {
+    private void refreshClientTable() {
 
         Transaction transaction = session.beginTransaction();
-        List<Client> allClients = session.createCriteria(Client.class).list();
+        List allClients = session.createCriteria(Client.class).list();
         transaction.commit();
 
-        ObservableList<Client> clientsList = FXCollections.observableArrayList(allClients);
+        ObservableList clientsList = FXCollections.observableArrayList(allClients);
         clientsTable.setItems(clientsList);
         clientsTable.refresh();
     }
@@ -563,13 +467,13 @@ public class MainController implements Initializable {
     // ----------------------------------------------------------------------------------------------------------------------------
     // ============================================================================================================================
     @FXML
-    public void loadDataFromWeaponDatabaseIntoCombobox(ActionEvent event) {
+    private void loadDataFromWeaponDatabaseIntoCombobox(ActionEvent event) {
 
         Transaction transaction = session.beginTransaction();
-        List<Weapon> allWeapons = session.createCriteria(Weapon.class).list();
+        List allWeapons = session.createCriteria(Weapon.class).list();
         transaction.commit();
 
-        ObservableList<Weapon> weaponsList = FXCollections.observableArrayList(allWeapons);
+        ObservableList weaponsList = FXCollections.observableArrayList(allWeapons);
         comboBoxWeapon.setItems(weaponsList);
 
         StringConverter<Weapon> scConverter = new StringConverter<Weapon>() {
@@ -586,32 +490,32 @@ public class MainController implements Initializable {
 
         };
         comboBoxWeapon.setConverter(scConverter);
-        
+
         refreshWeaponComboBox();
 
     }
 
     @FXML
-    public void refreshWeaponComboBox() {
+    private void refreshWeaponComboBox() {
 
         Transaction transaction = session.beginTransaction();
-        List<Weapon> allWeapons = session.createCriteria(Weapon.class).list();
+        List allWeapons = session.createCriteria(Weapon.class).list();
         transaction.commit();
 
-        ObservableList<Weapon> weaponsList = FXCollections.observableArrayList(allWeapons);
+        ObservableList weaponsList = FXCollections.observableArrayList(allWeapons);
         comboBoxWeapon.setItems(weaponsList);
-        
+
 
     }
 
     @FXML
-    public void loadDataFromClietnDatabaseIntoCombobox(ActionEvent event) {
+    private void loadDataFromClientDatabaseIntoCombobox(ActionEvent event) {
 
         Transaction transaction = session.beginTransaction();
-        List<Client> allClients = session.createCriteria(Client.class).list();
+        List allClients = session.createCriteria(Client.class).list();
         transaction.commit();
 
-        ObservableList<Client> clientsList = FXCollections.observableArrayList(allClients);
+        ObservableList clientsList = FXCollections.observableArrayList(allClients);
         comboBoxClient.setItems(clientsList);
 
         StringConverter<Client> scConverter = new StringConverter<Client>() {
@@ -633,28 +537,27 @@ public class MainController implements Initializable {
     }
 
     @FXML
-    public void refreshClientComboBox() {
+    private void refreshClientComboBox() {
 
         Transaction transaction = session.beginTransaction();
-        List<Client> allClients = session.createCriteria(Client.class).list();
+        List allClients = session.createCriteria(Client.class).list();
         transaction.commit();
 
-        ObservableList<Client> clientsList = FXCollections.observableArrayList(allClients);
+        ObservableList clientsList = FXCollections.observableArrayList(allClients);
         comboBoxClient.setItems(clientsList);
 
 
     }
 
     @FXML
-    public void setOrderPrice() {
+    private void setOrderPrice() {
 
-        if (comboBoxBullets.getItems() == null || comboBoxBullets.getItems().isEmpty()   || comboBoxBullets.getSelectionModel().isEmpty()) {
+        if (comboBoxBullets.getItems() == null || comboBoxBullets.getItems().isEmpty() || comboBoxBullets.getSelectionModel().isEmpty()) {
             textFieldPrice.setText(null);
-            return;
         } else {
-            
+
             int price = comboBoxBullets.getSelectionModel().getSelectedItem();
-            int price1 = (price/100) * 20;
+            int price1 = (price / 100) * 20;
             String result = String.valueOf(price1);
             textFieldPrice.setText(result);
             textFieldPrice.setDisable(true);
@@ -662,126 +565,78 @@ public class MainController implements Initializable {
         }
     }
 
-   @FXML
-    public void addOrder(ActionEvent event) {
-if(((comboBoxClient.getSelectionModel().getSelectedItem() == null) || (comboBoxClient.getSelectionModel().isEmpty())) || ((comboBoxWeapon.getSelectionModel().getSelectedItem() == null) || (comboBoxWeapon.getSelectionModel().isEmpty())) || ((comboBoxBullets.getSelectionModel().getSelectedItem() == null) || (comboBoxBullets.getSelectionModel().isEmpty()))){
-    labelInfoAdminOrders.setText("Proszę wypełnić wszystkie pola formularzu!");
-    return;
-}
+    @FXML
+    private void addOrder(ActionEvent event) {
+        if (((comboBoxClient.getSelectionModel().getSelectedItem() == null) || (comboBoxClient.getSelectionModel().isEmpty())) || ((comboBoxWeapon.getSelectionModel().getSelectedItem() == null) || (comboBoxWeapon.getSelectionModel().isEmpty())) || ((comboBoxBullets.getSelectionModel().getSelectedItem() == null) || (comboBoxBullets.getSelectionModel().isEmpty()))) {
+            labelInfoAdminOrders.setText("Proszę wypełnić wszystkie pola formularzu!");
+            return;
+        }
         Client client = comboBoxClient.getSelectionModel().getSelectedItem();
         Weapon weapon = comboBoxWeapon.getSelectionModel().getSelectedItem();
         Integer price = Integer.parseInt(textFieldPrice.getText());
 
         Order order = new Order(client, weapon, price, comboBoxBullets.getSelectionModel().getSelectedItem());
-        Transaction transaction = session.beginTransaction();
-        session.save(order);
-        transaction.commit();
+
+        saveToDatabase(order);
 
         comboBoxClient.getSelectionModel().clearSelection();
         comboBoxWeapon.getSelectionModel().clearSelection();
         comboBoxBullets.getSelectionModel().clearSelection();
         textFieldPrice.clear();
         labelInfoAdminOrders.setText("Dodano zamówienie!");
-        PauseTransition visiblePause = new PauseTransition(
-                Duration.seconds(3)
-        );
-        visiblePause.setOnFinished(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                labelInfoAdminOrders.setVisible(false);
-            }
-        });
-        visiblePause.play();
-        comboBoxBullets.getSelectionModel().clearSelection();
-        labelInfoAdminOrders.setVisible(true);
+        labelVisibility(labelInfoAdminOrders);
         loadOrderDataFromDatabase(null);
     }
 
 
     @FXML
-    public void loadOrderDataFromDatabase(ActionEvent event) {
+    private void loadOrderDataFromDatabase(ActionEvent event) {
 
         Transaction transaction = session.beginTransaction();
-        List<Order> allOrders = session.createCriteria(Order.class).list();
+        List allOrders = session.createCriteria(Order.class).list();
         transaction.commit();
 
-        
+
         columnPrice.setCellValueFactory(new PropertyValueFactory<>("price"));
-        columnBullets.setCellValueFactory(new PropertyValueFactory<>("loanPeriod"));
+        columnBullets.setCellValueFactory(new PropertyValueFactory<>("bullets"));
 
-        columnOrderClientName.setCellValueFactory(new Callback<CellDataFeatures<Order, String>, ObservableValue<String>>() {
-            @Override
-            public ObservableValue<String> call(CellDataFeatures<Order, String> p) {
-                return new SimpleStringProperty(p.getValue().getClient().getName());
-            }
-        });
+        columnOrderClientName.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getClient().getName()));
 
-        columnOrderClientSurname.setCellValueFactory(new Callback<CellDataFeatures<Order, String>, ObservableValue<String>>() {
-            @Override
-            public ObservableValue<String> call(CellDataFeatures<Order, String> p) {
-                return new SimpleStringProperty(p.getValue().getClient().getSurname());
-            }
-        });
+        columnOrderClientSurname.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getClient().getSurname()));
 
-        columnOrderClientId.setCellValueFactory(new Callback<CellDataFeatures<Order, Long>, ObservableValue<Long>>() {
-            @Override
-            public ObservableValue<Long> call(CellDataFeatures<Order, Long> p) {
-                return new SimpleObjectProperty<>(p.getValue().getClient().getPesel());
-            }
-        });
+        columnOrderClientId.setCellValueFactory(p -> new SimpleObjectProperty<>(p.getValue().getClient().getPesel()));
 
-        columnOrderBrand.setCellValueFactory(new Callback<CellDataFeatures<Order, String>, ObservableValue<String>>() {
-            @Override
-            public ObservableValue<String> call(CellDataFeatures<Order, String> p) {
-                return new SimpleStringProperty(p.getValue().getWeapon().getBrand());
-            }
-        });
+        columnOrderBrand.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getWeapon().getBrand()));
 
-        columnOrderType.setCellValueFactory(new Callback<CellDataFeatures<Order, String>, ObservableValue<String>>() {
-            @Override
-            public ObservableValue<String> call(CellDataFeatures<Order, String> p) {
-                return new SimpleStringProperty(p.getValue().getWeapon().getType());
-            }
-        });
+        columnOrderType.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getWeapon().getType()));
 
         ordersTable.setItems(null);
         ordersTable.setItems(ObservableListOrders);
 
-        ObservableList<Order> ordersList = FXCollections.observableArrayList(allOrders);
+        ObservableList ordersList = FXCollections.observableArrayList(allOrders);
         ordersTable.setItems(ordersList);
 
     }
 
     @FXML
-    public void deleteOrder(ActionEvent event) {
+    private void deleteOrder(ActionEvent event) {
         Order order = ordersTable.getSelectionModel().getSelectedItem();
-        Transaction transaction = session.beginTransaction();
-        session.delete(order);
-        transaction.commit();
+        deleteFromDatabase(order);
+
         labelInfoAdminOrders.setText("Usunięto zamówienie!");
-        PauseTransition visiblePause = new PauseTransition(
-                Duration.seconds(3)
-        );
-        visiblePause.setOnFinished(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                labelInfoAdminOrders.setVisible(false);
-            }
-        });
-        visiblePause.play();
-        labelInfoAdminOrders.setVisible(true);
+        labelVisibility(labelInfoAdminOrders);
         loadOrderDataFromDatabase(null);
         refreshOrdersTable();
     }
 
     @FXML
-    public void refreshOrdersTable() {
+    private void refreshOrdersTable() {
 
         Transaction transaction = session.beginTransaction();
-        List<Order> allOrders = session.createCriteria(Order.class).list();
+        List allOrders = session.createCriteria(Order.class).list();
         transaction.commit();
 
-        ObservableList<Order> ordersList = FXCollections.observableArrayList(allOrders);
+        ObservableList ordersList = FXCollections.observableArrayList(allOrders);
         ordersTable.setItems(ordersList);
         ordersTable.refresh();
     }

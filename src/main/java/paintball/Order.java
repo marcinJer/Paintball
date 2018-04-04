@@ -31,8 +31,8 @@ public class Order implements Serializable{
     @Column(name = "price")
     private Integer price;
 
-    @Column(name = "loanPeriod")
-    private Integer loanPeriod;
+    @Column(name = "bullets")
+    private Integer bullets;
 
     public Order() {
     }
@@ -41,7 +41,7 @@ public class Order implements Serializable{
       this.client = client;
       this.weapon = weapon;
       this.price = price;
-      this.loanPeriod = loanPeriod;
+      this.bullets = loanPeriod;
     }
 
     public Integer getId() {
@@ -76,11 +76,11 @@ public class Order implements Serializable{
         this.price = price;
     }
 
-    public Integer getLoanPeriod() {
-        return loanPeriod;
+    public Integer getBullets() {
+        return bullets;
     }
 
-    public void setLoanPeriod(Integer loanPeriod) {
-        this.loanPeriod = loanPeriod;
+    public void setBullets(Integer bullets) {
+        this.bullets = bullets;
     }
 }

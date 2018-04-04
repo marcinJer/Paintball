@@ -21,7 +21,7 @@ CREATE TABLE orders (
   clientId   INT NOT NULL,
   weaponId     INT NOT NULL,
   price      INT NOT NULL,
-  loanPeriod INT NOT NULL,
+  bullets INT NOT NULL,
 
   FOREIGN KEY (weaponId) REFERENCES weapons (id),
   FOREIGN KEY (clientId) REFERENCES clients (id)
